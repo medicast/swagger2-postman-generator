@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 const Swagger2Postman = require('../swagger2-postman-generator');
 
 const { host, port, swaggerFile } = require('minimist')(process.argv.slice(2));

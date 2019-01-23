@@ -1,5 +1,12 @@
 # swagger2-postman-generator #
 
+Command Line usage
+
+``` shell
+npm install swagger2-postman-generator -g
+swaggerToPostman --host=myHost --swaggerFile=spec.json 
+```
+
 A simple interface for converting Swagger v2 JSON Specs to a Postman Collection, with samples of Swagger request models added as JSON request bodies.
 
 Based on the [swagger2-to-postman](https://github.com/postmanlabs/swagger2-to-postman) NPM package and [Swagger UI](https://github.com/swagger-api/swagger-ui) JSON example request generator.
