@@ -312,5 +312,3 @@ Swagger2Postman
         }
     })
 ```
-
-    

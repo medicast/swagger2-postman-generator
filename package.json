@@ -1,5 +1,5 @@
 {
-  "name": "swagger2-postman-generator",
+  "name": "@medicast/swagger2-postman-generator",
   "version": "2.1.1",
   "description": "Use Swagger v2 JSON Collections to generate Postman v1 collections which include sample request bodies",
   "main": "swagger2-postman-generator.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/djfdyuruiry/swagger2-postman-generator.git"
+    "url": "git+https://github.com/medicast/swagger2-postman-generator.git"
   },
   "keywords": [
     "swagger",
@@ -16,10 +16,6 @@
   ],
   "author": "djfdyuruiry",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/djfdyuruiry/swagger2-postman-generator/issues"
-  },
-  "homepage": "https://github.com/djfdyuruiry/swagger2-postman-generator#readme",
   "dependencies": {
     "swagger2-to-json": "^1.1.1",
     "swagger2-to-object": "^1.0.9",
