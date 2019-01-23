@@ -6,8 +6,6 @@ const Swagger2Object = require("swagger2-to-object");
 
 const buildPostmanEnvironment = require("./buildPostmanEnvironment.js")
 
-const ignoredVariables = ["scheme", "host", "port"];
-
 /* postman collection post-processing */
 function populateRequestJsonIfDefined (postmanRequest, swaggerSpec, swaggerRefsLookup, options) {
     var url = postmanRequest.url;
@@ -110,8 +108,8 @@ function buildEnvironmentVariable (name, value = "", type = "text", enabled = tr
     }
 }
 
-function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {  
-    var environment = buildPostmanEnvironment();
+function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
+    var environment = buildPostmanEnvironment(options.host, options.port);
     var postmanCollectionJson = convertSwaggerToPostmanJson(swaggerSpec, options);
     var uniqueVariables = [...new Set(postmanCollectionJson.match(/\{\{.+?\}\}/g))];
 
@@ -126,10 +124,6 @@ function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
         var sanitisedVariableName = v.replace(/^{{|}}$/gm, "");
         uniqueVariableDictionary[sanitisedVariableName] = true;
 
-        if (ignoredVariables.includes(sanitisedVariableName)) {
-            return;
-        }
-
         var environmentVariable = buildEnvironmentVariable(sanitisedVariableName);
         environmentVariables.push(environmentVariable)
     });
@@ -140,26 +134,6 @@ function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
         options.environment.customVariables.length < 1) {
         return environment;
     }
-
-    options.environment.customVariables.forEach((cv) => {
-        var variableName = cv.key;
-        var environmentVariable = 
-            buildEnvironmentVariable(variableName, cv.value, cv.type, cv.enabled);
-
-        if (uniqueVariableDictionary[variableName]) {
-            // remove generated variable to prepare for custom one
-            var i = environmentVariables.length;
-
-            while (i--) {
-                if (environmentVariables[i].key === variableName) {
-                    environmentVariables.splice(i, 1);
-                }
-            }
-        }
-
-        environmentVariables.push(environmentVariable);
-    });
-
     return environment;
 }
 

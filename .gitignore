@@ -59,3 +59,7 @@ typings/
 
 .DS_Store
 example/*.json
+
+# generated postman files
+env.json
+postmanCollection.json
