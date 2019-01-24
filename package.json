@@ -11,7 +11,8 @@
     "url": "git+https://github.com/medicast/swagger2-postman-generator.git"
   },
   "bin": {
-    "swaggerToPostman": "bin/swaggerToPostman.js"
+    "swaggerToPostman": "bin/swaggerToPostman.js",
+    "uploadToPostman": "bin/uploadToPostman.js"
   },
   "keywords": [
     "swagger",
