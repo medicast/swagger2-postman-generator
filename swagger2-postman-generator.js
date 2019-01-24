@@ -63,6 +63,7 @@ function convertSwaggerToPostman (swaggerSpec, options) {
         postmanCollection.item.forEach((basicItem) => {
             basicItem.item.forEach((requestItem) => {
                 requestItem.request.url.host[0] = "{{url}}";
+                requestItem.request.url.protocol = options.protocol;
             });
         });
     }
