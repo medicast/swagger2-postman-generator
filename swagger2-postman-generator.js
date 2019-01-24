@@ -6,10 +6,13 @@ const Swagger2Object = require("swagger2-to-object");
 
 const buildPostmanEnvironment = require("./buildPostmanEnvironment.js")
 
+const ignoredVariables = ["scheme", "host", "port", "url"];
+
 /* postman collection post-processing */
 function populateRequestJsonIfDefined (postmanRequest, swaggerSpec, swaggerRefsLookup, options) {
     var url = postmanRequest.url;
     var basePath = swaggerSpec.basePath;
+    console.log("swaggerspec", swaggerSpec);
 
     var relativePath = url.replace(`{{scheme}}://{{host}}:{{port}}${basePath}`, "")
     var swaggerPath = ((relativePath.replace(/\/:([a-zA-Z0-9]+)/, "/{$1}")).split("?"))[0]
@@ -46,10 +49,7 @@ function processPostmanCollection (postmanCollection, swaggerSpec, options) {
         if (options && options.requestPreProcessor && typeof options.requestPreProcessor === "function") {
             options.requestPreProcessor(request, swaggerSpec, swaggerRefsLookup);
         }
-    
-        request.url = request.url.replace(/[hH][tT][tT][pP][sS]{0,1}:\/\//,  "{{scheme}}://");
-        request.url = request.url.replace(/:\/\/[^/]*/,  "://{{host}}:{{port}}");
-
+        request.url = request.url.replace(/[hH][tT][tT][pP][sS]{0,1}:\/\/[hH][tT][tT][pP][sS]{0,1}\/\/[^/]*/,  "{{url}}");
         populateRequestJsonIfDefined(request, swaggerSpec, swaggerRefsLookup, options);
 
         if (!options) {
@@ -81,8 +81,8 @@ function convertSwaggerSpecToPostmanCollection (swaggerSpec) {
 }
 
 function convertSwaggerToPostman (swaggerSpec, options) {  
-    var postmanCollection = convertSwaggerSpecToPostmanCollection(swaggerSpec, options);
-
+    var postmanCollection = convertSwaggerSpecToPostmanCollection(swaggerSpec);
+    console.log('postmancollection', postmanCollection);
     processPostmanCollection(postmanCollection, swaggerSpec, options);
 
     return postmanCollection;    
@@ -109,8 +109,11 @@ function buildEnvironmentVariable (name, value = "", type = "text", enabled = tr
 }
 
 function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
-    var environment = buildPostmanEnvironment(options.host, options.port);
     var postmanCollectionJson = convertSwaggerToPostmanJson(swaggerSpec, options);
+    const swaggerName = JSON.parse(postmanCollectionJson).name;
+    console.log('swaggername', swaggerName);
+    var environment = buildPostmanEnvironment(options, swaggerName);
+
     var uniqueVariables = [...new Set(postmanCollectionJson.match(/\{\{.+?\}\}/g))];
 
     if (options && options.environment && options.environment.name) {
@@ -124,6 +127,9 @@ function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
         var sanitisedVariableName = v.replace(/^{{|}}$/gm, "");
         uniqueVariableDictionary[sanitisedVariableName] = true;
 
+        if (ignoredVariables.includes(sanitisedVariableName)) {	
+            return;	
+        }
         var environmentVariable = buildEnvironmentVariable(sanitisedVariableName);
         environmentVariables.push(environmentVariable)
     });

@@ -4,7 +4,7 @@ Command Line usage
 
 ``` shell
 npm install swagger2-postman-generator -g
-swaggerToPostman --host=myHost --swaggerFile=spec.json 
+swaggerToPostman --url=http://blahblah.com --swaggerFile=spec.json --tier=myTier
 ```
 
 A simple interface for converting Swagger v2 JSON Specs to a Postman Collection, with samples of Swagger request models added as JSON request bodies.

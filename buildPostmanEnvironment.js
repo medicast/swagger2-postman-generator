@@ -1,27 +1,17 @@
-module.exports = function (host, port) {
-  port = port || "80";
+module.exports = function (options, swaggerName) {
+  let { url, tier } = options;
+  tier = tier || 'local';
+  console.log('swagger name', swaggerName);
   return JSON.parse(JSON.stringify({
     id: "685825e6-1261-04aa-3cb6-04c1259b0977",
-    name: "Swagger2 Environment",
+    name: `${swaggerName} - ${tier}`,
     values: [
       {
         enabled: true,
-        key: "scheme",
-        value: "http",
+        key: "url",
+        value: `${url}`,
         type: "text"
       },
-      {
-        enabled: true,
-        key: "port",
-        value: `${port}`,
-        type: "text"
-      }, 
-      {
-        enabled: true,
-        key: "host",
-        value: `${host}`,
-        type: "text"
-      }
     ],
     timestamp: 1509563973925,
     _postman_variable_scope: "environment",
