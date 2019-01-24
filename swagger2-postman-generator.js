@@ -1,7 +1,8 @@
 const fs = require("fs")
 const request = require("sync-request")
 
-const Swagger2Postman = require("swagger2-to-postman");
+// const Swagger2Postman = require("swagger2-to-postman");
+const Swagger2Postman = require("swagger2-postman2-parser");
 const Swagger2Object = require("swagger2-to-object"); 
 
 const buildPostmanEnvironment = require("./buildPostmanEnvironment.js")
@@ -40,52 +41,38 @@ function populateRequestJsonIfDefined (postmanRequest, swaggerSpec, swaggerRefsL
     }
 }
 
-function processPostmanCollection (postmanCollection, swaggerSpec, options) {
-    var swaggerRefsLookup = Swagger2Object
-        .buildRefsLookup()
-        .forSpec(swaggerSpec, options);    
+function processPostmanCollection (postmanCollection, options) {
+    if (options && options.url) {
+        postmanCollection.item.forEach((basicItem) => {
+            basicItem.item.forEach((requestItem) => {
+                requestItem.request.url.host[0] = "{{url}}";
+            });
+        });
+    }
+    return postmanCollection;
+}
 
-    postmanCollection.requests.forEach((request) => {
-        if (options && options.requestPreProcessor && typeof options.requestPreProcessor === "function") {
-            options.requestPreProcessor(request, swaggerSpec, swaggerRefsLookup);
-        }
-        request.url = request.url.replace(/[hH][tT][tT][pP][sS]{0,1}:\/\/[hH][tT][tT][pP][sS]{0,1}\/\/[^/]*/,  "{{url}}");
-        populateRequestJsonIfDefined(request, swaggerSpec, swaggerRefsLookup, options);
-
-        if (!options) {
-            return;
-        }
-
-        if (options.globalHeaders && options.globalHeaders.length > 0) {
-            options.globalHeaders.forEach(function(header) {
-                request.headers += `${header}\n`;
-            }, this);
-        }
-
-        if (options.requestPostProcessor && typeof options.requestPostProcessor === "function") {
-            options.requestPostProcessor(request, swaggerSpec, swaggerRefsLookup);
-        }
-    });
+function validateSwaggerJson (jsonString) {
+    const { result, reason } = Swagger2Postman.validate(jsonString);
+    if (!result) {
+        throw new Error(`Swagger validation failed with reason: ${reason}`);
+    }
 }
 
 /* swagger to postman conversions */
 function convertSwaggerSpecToPostmanCollection (swaggerSpec) {
-    var converter = new Swagger2Postman(); 
-    var convertResult = converter.convert(swaggerSpec);
-
-    if (convertResult.status === "failed") {
-        throw `postman conversion of swagger spec failed: ${JSON.stringify(convertResult)}`;
+    validateSwaggerJson(swaggerSpec);
+    const { status, collection } = Swagger2Postman.convert(swaggerSpec);
+    if (!status) {
+        throw new Error(`Swagger conversion with reason: ${reason}`);
     }
-
-    return convertResult.collection;
+    return collection;
 }
 
 function convertSwaggerToPostman (swaggerSpec, options) {  
     var postmanCollection = convertSwaggerSpecToPostmanCollection(swaggerSpec);
-    console.log('postmancollection', postmanCollection);
-    processPostmanCollection(postmanCollection, swaggerSpec, options);
-
-    return postmanCollection;    
+    // postmanCollection = processPostmanCollection(postmanCollection, options);
+    return postmanCollection;
 }
 
 function convertSwaggerToPostmanJson (swaggerSpec, options) {
@@ -111,7 +98,6 @@ function buildEnvironmentVariable (name, value = "", type = "text", enabled = tr
 function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
     var postmanCollectionJson = convertSwaggerToPostmanJson(swaggerSpec, options);
     const swaggerName = JSON.parse(postmanCollectionJson).name;
-    console.log('swaggername', swaggerName);
     var environment = buildPostmanEnvironment(options, swaggerName);
 
     var uniqueVariables = [...new Set(postmanCollectionJson.match(/\{\{.+?\}\}/g))];
