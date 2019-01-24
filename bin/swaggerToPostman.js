@@ -9,5 +9,5 @@ if (!url || !swaggerFile) {
 console.log("Converting Swagger to Postman Files");
 
 const fileObj = Swagger2Postman.convertSwagger().fromFile(swaggerFile)
-fileObj.toPostmanEnvironmentFile("postmanEnvironment.json", { url, tier });
-fileObj.toPostmanCollectionFile("postmanCollections.json");
+fileObj.toPostmanEnvironmentFile("postmanEnv.json", { url, tier });
+fileObj.toPostmanCollectionFile("postmanCollection.json", { url, tier });

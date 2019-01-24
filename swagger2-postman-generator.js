@@ -13,7 +13,6 @@ const ignoredVariables = ["scheme", "host", "port", "url"];
 function populateRequestJsonIfDefined (postmanRequest, swaggerSpec, swaggerRefsLookup, options) {
     var url = postmanRequest.url;
     var basePath = swaggerSpec.basePath;
-    console.log("swaggerspec", swaggerSpec);
 
     var relativePath = url.replace(`{{scheme}}://{{host}}:{{port}}${basePath}`, "")
     var swaggerPath = ((relativePath.replace(/\/:([a-zA-Z0-9]+)/, "/{$1}")).split("?"))[0]
@@ -41,17 +40,6 @@ function populateRequestJsonIfDefined (postmanRequest, swaggerSpec, swaggerRefsL
     }
 }
 
-function processPostmanCollection (postmanCollection, options) {
-    if (options && options.url) {
-        postmanCollection.item.forEach((basicItem) => {
-            basicItem.item.forEach((requestItem) => {
-                requestItem.request.url.host[0] = "{{url}}";
-            });
-        });
-    }
-    return postmanCollection;
-}
-
 function validateSwaggerJson (jsonString) {
     const { result, reason } = Swagger2Postman.validate(jsonString);
     if (!result) {
@@ -71,7 +59,13 @@ function convertSwaggerSpecToPostmanCollection (swaggerSpec) {
 
 function convertSwaggerToPostman (swaggerSpec, options) {  
     var postmanCollection = convertSwaggerSpecToPostmanCollection(swaggerSpec);
-    // postmanCollection = processPostmanCollection(postmanCollection, options);
+    if (options && options.url) {
+        postmanCollection.item.forEach((basicItem) => {
+            basicItem.item.forEach((requestItem) => {
+                requestItem.request.url.host[0] = "{{url}}";
+            });
+        });
+    }
     return postmanCollection;
 }
 
@@ -97,7 +91,7 @@ function buildEnvironmentVariable (name, value = "", type = "text", enabled = tr
 
 function convertSwaggerToPostmanEnvironment (swaggerSpec, options) {
     var postmanCollectionJson = convertSwaggerToPostmanJson(swaggerSpec, options);
-    const swaggerName = JSON.parse(postmanCollectionJson).name;
+    const swaggerName = JSON.parse(postmanCollectionJson).info.name;
     var environment = buildPostmanEnvironment(options, swaggerName);
 
     var uniqueVariables = [...new Set(postmanCollectionJson.match(/\{\{.+?\}\}/g))];
