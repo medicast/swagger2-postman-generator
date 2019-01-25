@@ -27,20 +27,22 @@ function convertSwaggerSpecToPostmanCollection(swaggerSpec) {
 }
 
 function addSomeTests(item) {
-    item.event = {
-        listen: "test",
+    item.event = [
+        {
+            listen: "test",
             script: {
-            exec: [
-                "pm.test(\"Validate 200 response\", function () {",
-                "    pm.response.to.have.status(200);",
-                "});"
-            ],
+                exec: [
+                    "pm.test(\"Validate 200 response\", function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});"
+                ],
                 "type": "text/javascript"
+            }
         }
-    };
+    ];
 }
 
-function parameterizeRequest (requestItem, options) {
+function parameterizeRequest(requestItem, options) {
     requestItem.request.url.host = ["{{url}}"];
     requestItem.request.url.protocol = options.protocol;
     addSomeTests(requestItem);
