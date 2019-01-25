@@ -27,13 +27,14 @@ function convertSwaggerSpecToPostmanCollection(swaggerSpec) {
 }
 
 function addSomeTests(item) {
+
     item.event = [
         {
             listen: "test",
             script: {
                 exec: [
-                    "pm.test(\"Validate 200 response\", function () {",
-                    "    pm.response.to.have.status(200);",
+                    `pm.test(\"Validate ${item.response[0].code} response\", function () {`,
+                    `    pm.response.to.have.status(${item.response[0].code});`,
                     "});"
                 ],
                 "type": "text/javascript"

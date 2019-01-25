@@ -17,7 +17,7 @@ const readFile = (fileName) => {
 }
 
 const updatePostmanCollection = (idToUpdate, postmanSpec) => {
-  return request("PUT", `${postmanCollections}/${idToUpdate}`,
+  return request("PUT", `${postmanCollections}/${idToUpdate}?workspace=${workspace}`,
     {
       headers: { "X-Api-Key": `${postmanKey}`, "Content-Type": "application/json" },
       json: postmanSpec
@@ -26,10 +26,10 @@ const updatePostmanCollection = (idToUpdate, postmanSpec) => {
 
 const createPostmanCollection = (postmanSpec) => {
   return request("POST", `${postmanCollections}?workspace=${workspace}`,
-  {
-    headers: { "X-Api-Key": `${postmanKey}`, "Content-Type": "application/json" },
-    json: postmanSpec
-  });
+    {
+      headers: { "X-Api-Key": `${postmanKey}`, "Content-Type": "application/json" },
+      json: postmanSpec
+    });
 }
 
 const updatePostmanEnv = (idToUpdate, postmanSpec) => {
@@ -42,10 +42,10 @@ const updatePostmanEnv = (idToUpdate, postmanSpec) => {
 
 const createPostmanEnv = (postmanSpec) => {
   return request("POST", `${postmanEnvs}?workspace=${workspace}`,
-  {
-    headers: { "X-Api-Key": `${postmanKey}`, "Content-Type": "application/json" },
-    json: postmanSpec
-  });
+    {
+      headers: { "X-Api-Key": `${postmanKey}`, "Content-Type": "application/json" },
+      json: postmanSpec
+    });
 }
 
 console.log("Reading Postman files");
@@ -64,8 +64,9 @@ const envs = JSON.parse(allEnvsResponse.getBody()).environments;
 const collectionToUpdate = collections.find(x => x.name === postmanSpec.info.name);
 if (collectionToUpdate) {
   console.log(`collection exists with name ${postmanSpec.info.name}. Updating.`);
-  const response = updatePostmanCollection(collectionToUpdate.id, stupidPostmanSpec);
-  console.log('response!', response.getBody());
+
+    const response = updatePostmanCollection(collectionToUpdate.id, stupidPostmanSpec);
+    console.log('response!', response.getBody());
 } else {
   console.log(`no collection found with name ${postmanSpec.info.name}.  Creating a new collection`);
   const response = createPostmanCollection(stupidPostmanSpec);
