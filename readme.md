@@ -2,6 +2,8 @@
 
 Command Line usage
 
+Go to [Github](https://github.com/settings/tokens) and create a github token with repo, package:read, and package:write permissions.
+
 ~/.npmrc should have these lines:
 ```
 @medicast:registry=https://npm.registry.github.com/
