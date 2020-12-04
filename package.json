@@ -21,7 +21,7 @@
   "author": "djfdyuruiry",
   "license": "MIT",
   "dependencies": {
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.3",
     "swagger2-postman2-converter": "0.0.3",
     "swagger2-postman2-parser": "^1.0.1",
     "swagger2-to-json": "^1.1.1",
